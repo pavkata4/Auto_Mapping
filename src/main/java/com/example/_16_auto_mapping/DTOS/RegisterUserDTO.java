@@ -1,21 +1,31 @@
 package com.example._16_auto_mapping.DTOS;
 
-public class RegisterUserDTO {
 
-    private String mail;
+import jakarta.validation.constraints.*;
+
+public class RegisterUserDTO {
+    @Email
+    private String email;
+
+    @NotBlank
+    @Size(min = 6, message = "Too short password")
+    @Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=[@#$%^&+=]*).*", message = "Password must contain at least one lowercase, uppercase and digit!")
     private String password;
     private String confirmPassword;
     private String fullName;
 
-    public RegisterUserDTO(String mail, String password, String confirmPassword, String fullName) {
-        this.mail = mail;
+    public RegisterUserDTO(String email, String password, String confirmPassword, String fullName) {
+        this.email = email;
         this.password = password;
         this.confirmPassword = confirmPassword;
         this.fullName = fullName;
     }
 
+    public RegisterUserDTO() {
+    }
+
     public void setMai(String mai) {
-        this.mail = mai;
+        this.email = mai;
     }
 
     public void setPassword(String password) {
@@ -30,8 +40,8 @@ public class RegisterUserDTO {
         this.fullName = fullName;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
     public String getPassword() {

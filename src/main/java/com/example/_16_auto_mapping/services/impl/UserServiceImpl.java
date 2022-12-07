@@ -3,12 +3,10 @@ package com.example._16_auto_mapping.services.impl;
 import com.example._16_auto_mapping.DTOS.LoginUserDTO;
 import com.example._16_auto_mapping.DTOS.RegisterUserDTO;
 import com.example._16_auto_mapping.entities.Role;
-import com.example._16_auto_mapping.entities.ShoppingCart;
 import com.example._16_auto_mapping.entities.User;
-import com.example._16_auto_mapping.repositories.UserDao;
+import com.example._16_auto_mapping.repositories.UserRepository;
 import com.example._16_auto_mapping.services.ShoppingCartServices;
 import com.example._16_auto_mapping.services.UserService;
-import com.example._16_auto_mapping.utils.ValidatorUtil;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,20 +20,18 @@ public class UserServiceImpl implements UserService {
     private final ShoppingCartServices shoppingCartServices;
 
     private final StringBuilder sb;
-    private final UserDao userDao;
+    private final UserRepository userRepository;
 
     private final ModelMapper mapper;
 
-    private final ValidatorUtil validatorUtil;
 
     private Optional <User> loggedUser;
 @Autowired
-    public UserServiceImpl(ShoppingCartServices shoppingCartServices, UserDao userDao, ModelMapper mapper, ValidatorUtil validatorUtil) {
+    public UserServiceImpl(ShoppingCartServices shoppingCartServices, UserRepository userRepository, ModelMapper mapper) {
     this.shoppingCartServices = shoppingCartServices;
     this.sb = new StringBuilder();
-    this.userDao = userDao;
+    this.userRepository = userRepository;
         this.mapper = mapper;
-    this.validatorUtil = validatorUtil;
 }
     @Override
     public Optional<User> getLoggedUser() {
@@ -59,28 +55,24 @@ public class UserServiceImpl implements UserService {
     sb.delete(0,sb.length());
        User user1;
        user1 = mapper.map(user, User.class);
-       user1.setShoppingCart(shoppingCartServices.addShoppingCart(new ShoppingCart()));
-    if (validatorUtil.isValid(user1)) {
-        if (user.getPassword().equals(user.getConfirmPassword())) {
-            if (userDao.findAll().isEmpty()) {
+       //user1.setShoppingCart(shoppingCartServices.addShoppingCart(new ShoppingCart()));
+        //if (user.getPassword().equals(user.getConfirmPassword())) {
+            if (userRepository.findAll().isEmpty()) {
                 user1.setRole(Role.ADMIN);
             } else {
                 user1.setRole(Role.USER);
             }
            // try {
-                userDao.saveAndFlush(user1);
-                sb.append(String.format("%s was registered!", user.getFullName()));
+                userRepository.saveAndFlush(user1);
+                sb.append(String.format("%s was registered.", user.getFullName()));
            // } catch (Exception e) {
              //   System.out.printf("Email %s already exist", user1.getMail());
            // }
-        }else {
-            sb.append("Passwords are not equals.");
+//        }else {
+//            sb.append("Passwords are not equals.");
+//
+//        }
 
-        }
-
-    }else {
-        validatorUtil.violations(user1).forEach(e -> sb.append(e.getMessage()).append(" "));
-    }
     return sb.toString().trim();
     }
 
@@ -88,7 +80,7 @@ public class UserServiceImpl implements UserService {
     public String loginUser(LoginUserDTO user) {
     sb.delete(0, sb.length());
     if(loggedUser == null){
-        loggedUser = userDao.findByMailAndPassword(user.getMail(), user.getPassword());
+        loggedUser = userRepository.findByEmailAndPassword(user.getEmail(), user.getPassword());
         if (loggedUser.isEmpty()){
             sb.append("Incorrect username / password");
             loggedUser = null;

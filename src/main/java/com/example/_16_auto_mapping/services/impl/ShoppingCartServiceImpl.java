@@ -3,38 +3,37 @@ import com.example._16_auto_mapping.entities.Game;
 import com.example._16_auto_mapping.entities.ShoppingCart;
 import com.example._16_auto_mapping.entities.User;
 import com.example._16_auto_mapping.exceptions.GameNotFoundException;
-import com.example._16_auto_mapping.exceptions.NotLoggedUserException;
-import com.example._16_auto_mapping.repositories.GameDao;
-import com.example._16_auto_mapping.repositories.ShoppingCartDao;
-import com.example._16_auto_mapping.repositories.UserDao;
+import com.example._16_auto_mapping.repositories.GameRepository;
+import com.example._16_auto_mapping.repositories.ShoppingCartRepository;
+
 import com.example._16_auto_mapping.services.ShoppingCartServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Component
+@Service
 public class ShoppingCartServiceImpl implements ShoppingCartServices {
 
-    private final ShoppingCartDao shoppingCartDao;
+    private final ShoppingCartRepository shoppingCartRepository;
 
-    private final GameDao gameDao;
+    private final GameRepository gameRepository;
 
     private StringBuilder sb;
 
     @Autowired
-    public ShoppingCartServiceImpl(ShoppingCartDao shoppingCartDao, UserDao userDao, GameDao gameDao, GameDao gameDao1) {
-        this.shoppingCartDao = shoppingCartDao;
-        this.gameDao = gameDao1;
+    public ShoppingCartServiceImpl(ShoppingCartRepository shoppingCartRepository, GameRepository gameRepository) {
+        this.shoppingCartRepository = shoppingCartRepository;
+        this.gameRepository = gameRepository;
 
         sb = new StringBuilder();
     }
 
     @Override
     public String AddItem(String title, Optional<User> loggedUser) {
-        Optional<Game> game = gameDao.findByTitle(title);
+        Optional<Game> game = gameRepository.findByTitle(title);
         try {
-            shoppingCartDao.save(loggedUser.get().getShoppingCart().addItem(game));
+            shoppingCartRepository.save(loggedUser.get().getShoppingCart().addItem(game));
 
         } catch (GameNotFoundException e) {
             return e.getMessage(title);
@@ -44,9 +43,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartServices {
 
     @Override
     public String removeItem(String title, Optional<User> loggedUser) throws GameNotFoundException {
-      Optional<Game>  game =  gameDao.findByTitle(title);
+      Optional<Game>  game =  gameRepository.findByTitle(title);
       if (game.isPresent() && loggedUser.get().getShoppingCart().getGamesToBuy().contains(game.get())){
-          shoppingCartDao.save(loggedUser.get().getShoppingCart().removeItem(game.get()));
+          shoppingCartRepository.save(loggedUser.get().getShoppingCart().removeItem(game.get()));
       }else {
           throw new GameNotFoundException();
       }
@@ -55,7 +54,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartServices {
 
     @Override
     public ShoppingCart addShoppingCart(ShoppingCart shoppingCart) {
-        shoppingCartDao.saveAndFlush(shoppingCart);
+        shoppingCartRepository.saveAndFlush(shoppingCart);
         return shoppingCart;
     }
 

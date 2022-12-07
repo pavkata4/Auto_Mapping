@@ -1,6 +1,6 @@
 package com.example._16_auto_mapping.services;
 
-import com.example._16_auto_mapping.entities.Game;
+
 import com.example._16_auto_mapping.entities.ShoppingCart;
 import com.example._16_auto_mapping.entities.User;
 import com.example._16_auto_mapping.exceptions.GameNotFoundException;

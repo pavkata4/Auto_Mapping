@@ -1,6 +1,9 @@
 package com.example._16_auto_mapping.entities;
 
-import javax.persistence.*;
+
+import jakarta.persistence.*;
+
+
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -8,27 +11,33 @@ import java.util.Set;
 @Table(name = "orders")
 public class Order {
 
-    private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private long id;
 
+    @Column(name = "total_price")
     private BigDecimal totalPrice;
 
+    @OneToMany
     private Set<Game> games;
+
+//    @ManyToOne(targetEntity = User.class)
+//    private User user;
 
 
     public Order() {
     }
-     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "id")
-    public Long getId() {
+
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    @Column(name = "total_price")
+
     public BigDecimal getTotalPrice() {
         return totalPrice;
     }
@@ -36,7 +45,7 @@ public class Order {
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
-@OneToMany
+
     public Set<Game> getGames() {
         return games;
     }
@@ -44,4 +53,13 @@ public class Order {
     public void setGames(Set<Game> games) {
         this.games = games;
     }
+
+
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 }

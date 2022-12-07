@@ -3,6 +3,9 @@ package com.example._16_auto_mapping.DTOS;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+
+
+
 public class DetailGameDTO {
 
     private String title;

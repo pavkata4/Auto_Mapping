@@ -1,0 +1,21 @@
+package com.example._16_auto_mapping.repositories;
+
+import  com.example._16_auto_mapping.entities.Game;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface GameRepository extends JpaRepository<Game, Long> {
+
+  Optional<Game> findById(long id);
+
+  boolean deleteById(long id);
+
+   List<Game> findAll();
+
+   Optional<Game> findByTitle(String title);
+}

@@ -3,10 +3,11 @@ package com.example._16_auto_mapping.services.impl;
 import com.example._16_auto_mapping.DTOS.DetailGameDTO;
 import com.example._16_auto_mapping.DTOS.GameDTO;
 import com.example._16_auto_mapping.entities.Game;
-import com.example._16_auto_mapping.repositories.GameDao;
+import com.example._16_auto_mapping.repositories.GameRepository;
 import com.example._16_auto_mapping.services.GameService;
-import com.example._16_auto_mapping.utils.ValidatorUtil;
+
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -20,18 +21,18 @@ import java.util.Optional;
 @Service
 public class GameServiceImpl  implements GameService {
 
+    private final GameRepository gameRepository;
 
-    private final GameDao gameDao;
-
-    private final ValidatorUtil validatorUtil;
+//    private final ValidatorUtil validatorUtil;
 
     private final StringBuilder sb;
 
     private final ModelMapper mapper;
 
-    public GameServiceImpl(GameDao gameDao, ValidatorUtil validatorUtil, ModelMapper mapper) {
-        this.gameDao = gameDao;
-        this.validatorUtil = validatorUtil;
+
+    @Autowired
+    public GameServiceImpl(GameRepository gameRepository, ModelMapper mapper) {
+        this.gameRepository = gameRepository;
         this.mapper = mapper;
         sb = new StringBuilder();
     }
@@ -39,19 +40,17 @@ public class GameServiceImpl  implements GameService {
     @Override
     public String addGame(Game game) {
         sb.delete(0, sb.length());
-        if (validatorUtil.isValid(game)){
-            gameDao.saveAndFlush(game);
+
+            gameRepository.saveAndFlush(game);
             sb.append(String.format("Added %s", game.getTitle()));
-        }else {
-            validatorUtil.violations(game).forEach(e-> sb.append(e.getMessage()).append(" "));
-        }
+
         return sb.toString().trim();
     }
 
     @Override
     public String editGame(long id, List<String> values) {
 
-        Optional<Game> game = gameDao.findById(id);
+        Optional<Game> game = gameRepository.findById(id);
         if (game.isPresent()){
 
             for (int i = 1; i < values.size(); i++) {
@@ -91,7 +90,7 @@ public class GameServiceImpl  implements GameService {
                       break;
               }
             }
-            gameDao.save(game.get());
+            gameRepository.save(game.get());
             sb.append(String.format("Edited %s", game.get().getTitle()));
         }else {
             sb.append("Invalid id");
@@ -101,8 +100,8 @@ public class GameServiceImpl  implements GameService {
 
     @Override
     public String deleteGame(long id) {
-        Optional<Game> gameToDelete = gameDao.findById(id);
-        if (gameDao.deleteById(id)) {
+        Optional<Game> gameToDelete = gameRepository.findById(id);
+        if (gameRepository.deleteById(id)) {
             return String.format("Deleted %s", gameToDelete.get().getTitle());
         }
         return String.format("Game with id %d does not found", id);
@@ -110,7 +109,7 @@ public class GameServiceImpl  implements GameService {
 
     @Override
     public void viewAllGames() {
-        List<Game> games = gameDao.findAll();
+        List<Game> games = gameRepository.findAll();
         List<GameDTO> gamesDto = new ArrayList<>();
 
 
@@ -124,7 +123,7 @@ public class GameServiceImpl  implements GameService {
 
     @Override
     public String findGame(String title) {
-      Optional<Game> game =  gameDao.findByTitle(title);
+      Optional<Game> game =  gameRepository.findByTitle(title);
       if (game != null) {
           DetailGameDTO detailGameDTO = mapper.map(game.get(), DetailGameDTO.class);
           return detailGameDTO.toString();

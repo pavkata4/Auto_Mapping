@@ -2,6 +2,7 @@ package com.example._16_auto_mapping.DTOS;
 
 import java.math.BigDecimal;
 
+
 public class GameDTO {
     private String title;
 

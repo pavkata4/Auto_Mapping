@@ -1,9 +1,8 @@
 package com.example._16_auto_mapping.entities;
 
-import org.hibernate.validator.constraints.Length;
 
-import javax.persistence.*;
-import javax.validation.constraints.Pattern;
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -12,27 +11,42 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User{
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
 private long id;
-    private String mail;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+    @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "full_name", nullable = false)
     private String fullName;
-   private Set<Game> games;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Game> games;
+    @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(fetch = FetchType.EAGER)
     private Set<Order> orders;
 
-    private BigDecimal availableCash = new BigDecimal("0");
-    private ShoppingCart shoppingCart;
+    @Column(name = "available_cash")
+    private BigDecimal availableCash;
+    @OneToOne(targetEntity = ShoppingCart.class)
+//    @JoinColumn(name = "shopping_cart_id",referencedColumnName = "id")
+   private ShoppingCart shoppingCart;
 
     public User(Set<Order> orders) {
         this.orders = new LinkedHashSet<>();
         this.availableCash = new BigDecimal("0");
-        this.shoppingCart = new ShoppingCart();
+       this.shoppingCart = new ShoppingCart();
     }
 
+    public User() {
+
+    }
     public User( String mail, String password, String fullName, Role role) {
 
-        this.mail = mail;
+        this.email = mail;
         this.password = password;
         this.fullName = fullName;
         this.games = new HashSet<>();
@@ -43,18 +57,18 @@ private long id;
 
 
 
-    @Column(name = "mail", nullable = false, unique = true)
-    @Pattern(regexp = "\\w+[@]\\w+\\.[a-z]+", message = "Incorrect email.")
-    public String getMail() {
-        return mail;
+
+//    @Pattern(regexp = "\\w+[@]\\w+\\.[a-z]+", message = "Incorrect email.")
+    public String getEmail() {
+        return email;
     }
-    public void setMail(String mail) {
-        this.mail = mail;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    @Length(min = 6, message = "Too short password")
-    @Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=[@#$%^&+=]*).*", message = "Password must contain at least one lowercase, uppercase and digit!")
-    @Column(name = "password", nullable = false)
+//    @Length(min = 6, message = "Too short password")
+//    @Pattern(regexp = "(?=.*[a-z])(?=.*[A-Z])(?=[@#$%^&+=]*).*", message = "Password must contain at least one lowercase, uppercase and digit!")
+
     public String getPassword() {
         return password;
     }
@@ -62,7 +76,7 @@ private long id;
     public void setPassword(String password) {
         this.password = password;
     }
-    @Column(name = "full_name", nullable = false)
+
     public String getFullName() {
         return fullName;
     }
@@ -71,7 +85,7 @@ private long id;
         this.fullName = fullName;
     }
 
-    @ManyToMany
+
     public Set<Game> getGames() {
         return games;
     }
@@ -79,7 +93,7 @@ private long id;
     public void setGames(Set<Game> games) {
         this.games = games;
     }
-@Enumerated(EnumType.STRING)
+
     public Role getRole() {
         return role;
     }
@@ -87,9 +101,7 @@ private long id;
     public void setRole(Role role) {
         this.role = role;
     }
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+
     public long getId() {
         return id;
     }
@@ -99,9 +111,8 @@ private long id;
     }
 
 
-     @OneToOne(targetEntity = ShoppingCart.class)
-     @JoinColumn(name = "shopping_cart_id",referencedColumnName = "id")
-    public ShoppingCart getShoppingCart() {
+
+     public ShoppingCart getShoppingCart() {
         return shoppingCart;
     }
 
@@ -109,7 +120,7 @@ private long id;
         this.shoppingCart = shoppingCart;
     }
 
-      @Column(name = "available_cash")
+
     public BigDecimal getAvailableCash() {
         return availableCash;
     }
@@ -120,7 +131,7 @@ private long id;
         }
             this.availableCash = this.availableCash.add(availableCash);
     }
-    @OneToMany
+
     public Set<Order> getOrders() {
         return orders;
     }
